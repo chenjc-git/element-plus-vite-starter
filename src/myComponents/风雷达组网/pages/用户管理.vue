@@ -1,7 +1,7 @@
 <template>
   <datatable
     style="padding: 10px"
-    database="host=127.0.0.1&port=3306&user=admin&password=EkWM76Z8IJbfviCr&database=weatherservice"
+    database="host=192.168.0.240&port=3306&user=root&password=mysql&database=weatherservice"
     table="userinfo"
     :headerOption="headerOption"
   ></datatable>

@@ -55,7 +55,7 @@ export default defineConfig({
       ext: '.gz', // 压缩文件后缀名
       deleteOriginFile:false
     }),
-    mock(),
+    // mock(),
     vueJsx(),
     vueSetupExtend({}),
     inject({
@@ -122,7 +122,7 @@ export default defineConfig({
       },
       '/backend':{
         // target:'https://websocket.tanglei.top',//替换的服务端地址
-        target:'http://127.0.0.1:3000',//替换的服务端地址
+        target:'http://192.168.0.115:3000',//替换的服务端地址
         // target:'https://test.tanglei.site',//替换的服务端地址
         secure:false,
         changeOrigin:true,//允许跨域
@@ -151,7 +151,7 @@ export default defineConfig({
       },
       '/amap':{
         // target:'http://tanglei.top:8000',//替换的服务端地址
-        target:'http://192.168.0.133:8000',//替换的服务端地址
+        target:'http://192.168.0.131:8000',//替换的服务端地址
         changeOrigin:true,//开启代理，允许跨域
         rewrite:path=>path.replace(/^\/amap/,'') // 设置重写的路径
       }
