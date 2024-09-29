@@ -26,4 +26,12 @@ import './permission'
 app.directive('dialogDrag',dragable)
 app.directive('resize',resize)
 app.use(VueDOMPurifyHTML)
+
+// 全局注册element-plus/icons-vue
+import * as ICONS from '@element-plus/icons-vue'
+Object.entries(ICONS).forEach(([key, component]) => {
+  // app.component(key === 'PieChart' ? 'PieChartIcon' : key, component)
+  app.component(key, component)
+})
+
 router.isReady().then(()=>app.mount("#app"))

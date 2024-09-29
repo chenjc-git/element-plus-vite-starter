@@ -154,6 +154,12 @@ export default defineConfig({
         target:'http://192.168.0.131:8000',//替换的服务端地址
         changeOrigin:true,//开启代理，允许跨域
         rewrite:path=>path.replace(/^\/amap/,'') // 设置重写的路径
+      },
+      '/django':{
+        // target:'http://tanglei.top:8000',//替换的服务端地址
+        target:'http://127.0.0.1:8000',//替换的服务端地址
+        changeOrigin:true,//开启代理，允许跨域
+        rewrite:path=>path.replace(/^\/django/,'') // 设置重写的路径
       }
     }
   }

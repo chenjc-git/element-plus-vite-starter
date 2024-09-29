@@ -6,6 +6,7 @@ import jx from "./subs/jx.js";
 import dev from "./subs/dev.js";
 import zh from "./subs/zh.js";
 import cq from "./subs/cq.js";
+import cq_hide from "./subs/cq_hide.js";
 import device from "./subs/device.js";
 export const useSettingStore = defineStore({
   id: 'setting',
@@ -536,6 +537,7 @@ export const useSettingStore = defineStore({
       ry,
       jx,
       cq,
+      cq_hide,
       device,
       {
         path: 'qqlogin',

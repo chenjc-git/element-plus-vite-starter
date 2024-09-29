@@ -96,13 +96,31 @@ export default {
             label: '用户管理',
           }
         },
+        // {
+        //   path: 'device',
+        //   name: 'da20fee1-5ad7-51e1-2768-5e0933011a11',
+        //   component: '/src/myComponents/风雷达组网/pages/单站管理.vue',
+        //   svg:'91e315392d3d11ef98d8b025aa2c9ada',
+        //   meta:{
+        //     label: '单站管理',
+        //   }
+        // },
+        {
+          path: 'user',
+          name: 'da20fee1-5ad7-51e1-2768-5e0933011a12',
+          component: '/src/views/user/index.vue',
+          svg:'f11a18a8d6c711ee9aafb025aa2c9ada',
+          meta:{
+            label: '用户管理',
+          }
+        },
         {
           path: 'device',
-          name: 'da20fee1-5ad7-51e1-2768-5e0933011a11',
-          component: '/src/myComponents/风雷达组网/pages/单站管理.vue',
+          name: 'da20fee1-5ad7-51e1-2768-5e0933011a13',
+          component: '/src/views/device/index.vue',
           svg:'91e315392d3d11ef98d8b025aa2c9ada',
           meta:{
-            label: '单站管理',
+            label: '设备管理',
           }
         },
       ]
