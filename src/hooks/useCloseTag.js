@@ -1,5 +1,5 @@
 import { useTags } from '~/stores/modules/tags'
-import { reactive, toRefs, getCurrentInstance } from 'vue'
+import {reactive, toRefs, getCurrentInstance, nextTick} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 // 关闭当前标签
@@ -8,6 +8,7 @@ export default () => {
   const router = useRouter()
   const route = useRoute()
   const { delTag } = useTags()
+  const tagsStore = useTags()
   const state = reactive({
     /**
      * @param {String} fullPath 要跳转到那个页面的地址
@@ -20,9 +21,15 @@ export default () => {
       fullPath ? router.push(fullPath) : router.back()
       reload &&
         setTimeout(() => {
-          instance.appContext.config.globalProperties.$tagsbar.refreshSelectedTag(
-            route
-          )
+          router.push(fullPath)
+          /*tagsStore.deCacheList(route)
+          const { fullPath } = route
+          nextTick(() => {
+            router.replace({
+              path: fullPath,
+            })
+          })*/
+
         }, 500)
 
       f5 && setTimeout(() => window.location.reload(), 500)

@@ -364,7 +364,7 @@ export default defineComponent({
 
     // 请求列表数据
     const getTableData = async () => {
-      console.log('=====================')
+      console.log("getTableData=================")
       state.loading = true
       const searchModel = optimizeFields(props.search)
       const { data, total } = await props.request({
@@ -453,6 +453,10 @@ export default defineComponent({
           })
         }
       },
+      refreshAll() {
+        // state.handleReset()
+        getTableData()
+      }
     })
 
     if (typeof props.pagination === 'object') {

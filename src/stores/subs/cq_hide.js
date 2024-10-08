@@ -20,7 +20,7 @@ export default {
       children:[
         {
           path: 'device/add',
-          name: 'da20fee1-5ad7-51e1-2768-5e0933011b11',
+          name: 'cq20fee1-5ad7-51e1-2768-5e0933011b11',
           component: '/src/views/device/Add.vue',
           svg:'91e315392d3d11ef98d8b025aa2c9ada',
           meta:{
@@ -29,7 +29,7 @@ export default {
         },
         {
           path: 'device/edit/:id',
-          name: 'da20fee1-5ad7-51e1-2768-5e0933011b12',
+          name: 'cq20fee1-5ad7-51e1-2768-5e0933011b12',
           component: '/src/views/device/Edit.vue',
           svg:'91e315392d3d11ef98d8b025aa2c9ada',
           meta:{

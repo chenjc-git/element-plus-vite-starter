@@ -254,7 +254,6 @@ export default defineComponent({
       },
       // 保存新增、编辑数据
       submitForm() {
-        console.log(state.formRef)
         state.formRef.validate(async valid => {
           if (valid) {
             const { code, data, msg } = await saveUser(state.formData)

@@ -22,3 +22,11 @@ export function save(params){
     data: {...params}
   })
 }
+
+export function del(params){
+  return request({
+    url: 'django/api/device/delete',
+    method: 'post',
+    data: {...params}
+  })
+}

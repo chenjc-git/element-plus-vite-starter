@@ -41,16 +41,37 @@
       >
         编辑
       </el-button>
-      <el-button size="small" icon="Delete" type="danger">
+      <el-button
+        size="small"
+        type="danger"
+        icon="Delete"
+        @click="handleDelete(scope.row)"
+      >
         删除
       </el-button>
     </template>
   </pro-table>
+  <el-dialog
+      title="提示"
+      v-model="dialogVisible"
+      @close="handleCloseDialog"
+      width="500"
+  >
+    <span>确定要删除这条记录吗？</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmDelete(deleteScope)">
+          确 定
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
-import { defineComponent, reactive, ref, toRefs, onBeforeMount } from 'vue'
-import { getDeviceList } from '~/api/network/device'
+import {defineComponent, reactive, ref, toRefs, onBeforeMount, watch} from 'vue'
+import {getDeviceList, del as deleteDevice, del} from '~/api/network/device'
 import {ElMessage} from "element-plus";
 import {getCurrentInstance} from "vue-demi";
 export default defineComponent({
@@ -153,6 +174,24 @@ export default defineComponent({
           },
         ],
       },
+      dialogVisible: false,
+      deleteScope: null,
+
+      handleCloseDialog() {
+        state.dialogVisible = false;
+      },
+      async confirmDelete(params) {
+        await deleteDevice(params)
+        state.dialogVisible = false;
+        table.value.refresh()
+      },
+      async handleDelete(params) {
+        console.log(params)
+        console.log(state.dialogVisible)
+        state.deleteScope = params
+        state.dialogVisible = true;  // 显示对话框
+      },
+
       view() {
         if (state.selectedItems.length !== 0) {
           let item = state.selectedItems[0]
@@ -176,7 +215,6 @@ export default defineComponent({
       async getTableList(params) {
         // params是从组件接收的，包含分页和搜索字段。
         const { data } = await getDeviceList(params)
-        console.log(data)
 
         // 必须要返回一个对象，包含data数组和total总数
         return {
@@ -193,6 +231,13 @@ export default defineComponent({
     onBeforeMount(() => {
       // state.router = router
     })
+
+    // 监听路由参数变化
+    watch(() => proxy.$route.params, (newParams) => {
+      if (JSON.stringify(newParams) === '{}') {
+        table.value.refreshAll()
+      }
+    });
 
     return { ...toRefs(state), refresh, table }
   },
