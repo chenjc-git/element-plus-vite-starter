@@ -277,7 +277,7 @@
             label-position="left"
         >
           <el-switch
-              v-model="formData.hide"
+              v-model="isHidden"
               inline-prompt
               active-text="是"
               inactive-text="否"
@@ -322,10 +322,26 @@
         </el-form-item>
       </div>
     </el-form>
+
+    <el-dialog
+      title="确认修改"
+      v-model="dialogVisible"
+      @close="handleCloseDialog"
+      width="500"
+    >
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirmSave()">
+            确 定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script>
-import {defineComponent, onBeforeMount, onMounted, reactive, ref, toRefs, watch} from 'vue'
+import {computed, defineComponent, onBeforeMount, onMounted, reactive, ref, toRefs, watch} from 'vue'
 import useCloseTag from "~/hooks/useCloseTag";
 import { edit as editDevice, save as saveDevice } from "~/api/network/device";
 import { getCurrentInstance } from "vue-demi";
@@ -380,6 +396,8 @@ export default defineComponent({
           value: 3,
         },
       ],
+      dialogVisible: false,
+      isHidden: false,
 
       // 返回（关闭）
       back() {
@@ -394,10 +412,7 @@ export default defineComponent({
       save() {
         state.form.validate(async valid => {
           if (valid) {
-            const { data } = await saveDevice(state.formData)
-            if (data.code === 200) {
-              state.closeTag()
-            }
+            state.dialogVisible = true;  // 显示对话框
           }
         })
       },
@@ -406,11 +421,22 @@ export default defineComponent({
       async editForm(params) {
         // params是从组件接收的，包含分页和搜索字段。
         const { data } = await editDevice(params)
-        console.log(data.data)
 
         // 必须要返回一个对象，包含data数据
         // state.formData = data.data
         state.formData = data.data
+      },
+
+      handleCloseDialog() {
+        state.dialogVisible = false;
+      },
+
+      async confirmSave() {
+        const { data } = await saveDevice(state.formData)
+        if (data.code === 200) {
+          state.handleCloseDialog()
+          state.closeTag()
+        }
       },
     })
 
@@ -426,6 +452,13 @@ export default defineComponent({
     watch(() => proxy.$route.params, (newParams) => {
       if (JSON.stringify(newParams) !== '{}') {
         state.editForm(newParams)  // 当路由参数变化时重新加载数据
+      }
+    });
+    state.isHidden = computed(() => {
+      if (state.formData.hide === 'true') {
+        return true
+      } else {
+        return false
       }
     });
 

@@ -22,3 +22,19 @@ export function save(params){
     data: {...params}
   })
 }
+
+export function del(params){
+  return request({
+    url: 'django/api/base/user/delete',
+    method: 'post',
+    data: {...params}
+  })
+}
+
+export function batchDel(params){
+  return request({
+    url: 'django/api/base/user/batchDelete',
+    method: 'post',
+    data: {...params}
+  })
+}

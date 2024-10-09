@@ -12,18 +12,18 @@
     <template #toolbar>
       <el-button
         type="primary"
-        icon="Edit"
+        icon="Plus"
         @click="$router.push('/cq/system/device/add')"
       >
         新增
       </el-button>
-      <el-button type="info" icon="Search" @click="view" >
+<!--      <el-button type="info" icon="Search" @click="view" >
         查看
-      </el-button>
+      </el-button>-->
       <el-button type="danger" icon="Delete" @click="batchDelete">
         批量删除
       </el-button>
-      <el-button type="primary" icon="RefreshRight" @click="refresh">
+      <el-button type="primary" icon="Refresh" @click="refresh">
         刷新
       </el-button>
     </template>
@@ -52,16 +52,16 @@
     </template>
   </pro-table>
   <el-dialog
-      title="提示"
-      v-model="dialogVisible"
-      @close="handleCloseDialog"
-      width="500"
+    :title="dialog.title"
+    v-model="dialog.visible"
+    @close="handleCloseDialog"
+    width="500"
   >
-    <span>确定要删除这条记录吗？</span>
+    <span>{{ dialog.tip }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirmDelete(deleteScope)">
+        <el-button @click="dialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="dialog.callConfirm">
           确 定
         </el-button>
       </div>
@@ -71,9 +71,10 @@
 
 <script>
 import {defineComponent, reactive, ref, toRefs, onBeforeMount, watch} from 'vue'
-import {getDeviceList, del as deleteDevice, del} from '~/api/network/device'
+import {getDeviceList, del as deleteDevice, batchDel as batchDeleteDevice } from '~/api/network/device'
 import {ElMessage} from "element-plus";
 import {getCurrentInstance} from "vue-demi";
+import {batchDel as batchDelUser} from "~/api/network/user";
 export default defineComponent({
   name: 'Device',
   setup() {
@@ -174,22 +175,57 @@ export default defineComponent({
           },
         ],
       },
-      dialogVisible: false,
+      dialog: {
+        type: null,
+        title: null,
+        tip: null,
+        visible: false,
+        callConfirm: () => {
+          if (state.dialog.type === 'delete') {
+            state.confirmDelete(state.deleteScope)
+          } else if (state.dialog.type === 'batchDelete') {
+            state.confirmBatchDelete(state.selectedItems)
+          }
+        }
+      },
       deleteScope: null,
 
       handleCloseDialog() {
-        state.dialogVisible = false;
+        state.dialog.visible = false;
       },
       async confirmDelete(params) {
         await deleteDevice(params)
-        state.dialogVisible = false;
+        state.dialog.visible = false;
         table.value.refresh()
       },
-      async handleDelete(params) {
-        console.log(params)
-        console.log(state.dialogVisible)
+      async confirmBatchDelete(items) {
+        let ids_arr = []
+        items.forEach(item => {
+          ids_arr.push(item.id)
+        })
+        await batchDeleteDevice({'ids': ids_arr})
+        state.dialog.visible = false;
+        table.value.refresh()
+      },
+      handleDelete(params) {
+        state.dialog.type = 'delete'
+        state.dialog.title = '删除设备'
+        state.dialog.tip = '确认要删除该设备吗?'
         state.deleteScope = params
-        state.dialogVisible = true;  // 显示对话框
+        state.dialog.visible = true;  // 显示对话框
+      },
+      batchDelete() {
+        if (state.selectedItems.length === 0) {
+          ElMessage({
+            message: '请选择要删除的设备！',
+            type: "error",
+          });
+        } else {
+          state.dialog.type = 'batchDelete'
+          state.dialog.title = '批量删除设备'
+          state.dialog.tip = '确认要删除选中的设备吗?'
+          state.dialog.visible = true;  // 显示对话框
+        }
       },
 
       view() {
@@ -203,9 +239,6 @@ export default defineComponent({
             showClose: true,
           });
         }
-      },
-      batchDelete() {
-        console.log(state.selectedItems)
       },
       // 选择
       handleSelectionChange(arr) {

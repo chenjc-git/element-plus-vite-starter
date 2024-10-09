@@ -36,6 +36,24 @@ export default {
             label: '编辑设备',
           }
         },
+        {
+          path: 'user/add',
+          name: 'cq20fee1-5ad7-51e1-2768-5e0933011b13',
+          component: '/src/views/user/Add.vue',
+          svg:'91e315392d3d11ef98d8b025aa2c9ada',
+          meta:{
+            label: '新增用户',
+          }
+        },
+        {
+          path: 'user/edit/:id',
+          name: 'cq20fee1-5ad7-51e1-2768-5e0933011b14',
+          component: '/src/views/user/Edit.vue',
+          svg:'91e315392d3d11ef98d8b025aa2c9ada',
+          meta:{
+            label: '编辑用户',
+          }
+        },
       ]
     },
   ]

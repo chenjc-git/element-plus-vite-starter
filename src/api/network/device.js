@@ -30,3 +30,11 @@ export function del(params){
     data: {...params}
   })
 }
+
+export function batchDel(params){
+  return request({
+    url: 'django/api/device/batchDelete',
+    method: 'post',
+    data: {...params}
+  })
+}

@@ -12,11 +12,11 @@
       <el-button
         type="primary"
         icon="Plus"
-        @click="showDialog('新增')"
+        @click="$router.push('/cq/system/user/add')"
       >
         新增
       </el-button>
-      <el-button type="primary" icon="Delete" @click="batchDelete">
+      <el-button type="danger" icon="Delete" @click="batchDelete">
         批量删除
       </el-button>
       <el-button type="primary" icon="Refresh" @click="refresh">
@@ -24,77 +24,56 @@
       </el-button>
     </template>
     <template #is_active="{row}">
-      <el-tag :type="row.is_active === 1 ? 'success' : 'error'">
-        {{ row.is_active === 1 ? '启用' : '禁用' }}
+      <el-tag :type="row.is_active === true ? 'success' : 'error'">
+        {{ row.is_active === true ? '启用' : '禁用' }}
       </el-tag>
     </template>
     <template #operate="scope">
       <el-button
         size="small"
         type="primary"
-        @click="showDialog('编辑', scope.row)"
+        icon="Edit"
+        @click="$router.push(`/cq/system/user/edit/${scope.row.id}`)"
       >
         编辑
       </el-button>
-      <el-button size="small" type="danger">
+      <el-button
+        size="small"
+        type="danger"
+        icon="Delete"
+        @click="handleDelete(scope.row)"
+      >
         删除
       </el-button>
     </template>
   </pro-table>
   <el-dialog
-    :title="dialogTitle"
-    v-model="dialogVisible"
-    width="50%"
-    height="500px"
-    class="edit"
-    :before-close="handleCloseDialog"
+    :title="dialog.title"
+    v-model="dialog.visible"
+    @close="handleCloseDialog"
+    width="500"
   >
-    <!-- 表单内容 -->
-    <el-form :model="formData" ref="formRef" class="form">
-      <el-form-item label="用户名" style="padding-left:15px; margin-right:50px">
-        <el-input v-model="formData.username"></el-input>
-      </el-form-item>
-      <el-form-item label="昵称" style="margin-right:50px">
-        <el-input v-model="formData.nickname"></el-input>
-      </el-form-item>
-      <el-form-item label="邮箱" style="margin-right:50px">
-        <el-input v-model="formData.email" :disabled="isDisabled"></el-input>
-      </el-form-item>
-      <el-form-item label="登录类型" style="margin-right:50px">
-        <el-input v-model="formData.login_type"></el-input>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-select
-          v-model="formData.is_active"
-          :placeholder="activeSelect.label"
-          style="width: 195px;"
-        >
-          <el-option
-            v-for="option of activeSelect.options"
-            :key="option.value"
-            :label="option.name"
-            :value="option.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <!-- 其他表单项 -->
-    </el-form>
+    <span>{{ dialog.tip }}</span>
     <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="submitForm">保存</el-button>
-          </span>
+      <div class="dialog-footer">
+        <el-button @click="dialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="dialog.callConfirm">
+          确 定
+        </el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
 
 <script>
-import { defineComponent, reactive, ref, toRefs } from 'vue'
-import { getUserList, edit as editUser, save as saveUser } from '~/api/network/user'
+import {defineComponent, reactive, ref, toRefs, watch} from 'vue'
+import { getUserList, del as delUser, batchDel as batchDeleteUser } from '~/api/network/user'
+import {ElMessage} from "element-plus";
+import {getCurrentInstance} from "vue-demi";
 export default defineComponent({
   name: 'User',
   setup() {
-    // const { proxy } = getCurrentInstance()
+    const { proxy } = getCurrentInstance()
 
     const state = reactive({
       formRef: ref(null),
@@ -103,38 +82,13 @@ export default defineComponent({
       columns: [
         { type: 'selection', width: 56 },
         { label: '序号', type: 'index', width: 80 },
-        {
-          label: '用户名',
-          prop: 'username',
-          sortable: true,
-          width: 180,
-        },
-        {
-          label: '昵称',
-          prop: 'nickname',
-          width: 180,
-        },
-        {
-          label: '邮箱',
-          prop: 'email',
-          minWidth: 200,
-        },
-        {
-          label: '登录类型',
-          prop: 'login_type',
-          width: 180,
-        },
-        {
-          label: '状态',
-          tdSlot: 'is_active',
-          width: 180,
-        },
-        {
-          label: '操作',
-          width: 200,
-          align: 'center',
-          tdSlot: 'operate', // 自定义单元格内容的插槽名称
-        },
+        { label: '用户名', prop: 'username', sortable: true, width: 180, },
+        { label: '昵称', prop: 'nickname', width: 180, },
+        { label: '邮箱', prop: 'email', minWidth: 200, },
+        { label: '登录类型', prop: 'login_type', width: 180, },
+        { label: '描述', prop: 'introduction', width: 250, },
+        { label: '状态', tdSlot: 'is_active', width: 180, fixed: 'right' , },
+        { label: '操作', width: 200, align: 'center', tdSlot: 'operate', fixed: 'right' , },
       ],
       // 搜索配置
       searchConfig: {
@@ -147,34 +101,27 @@ export default defineComponent({
             name: 'username',
             defaultValue: '',
           },
-          // {
-          //   label: '状态',
-          //   name: 'is_active',
-          //   type: 'select',
-          //   defaultValue: 0,
-          //   options: [
-          //     {
-          //       name: '启用',
-          //       value: 1,
-          //     },
-          //     {
-          //       name: '禁用',
-          //       value: 0,
-          //     },
-          //   ],
-          // },
+          {
+            label: '状态',
+            name: 'is_active',
+            type: 'select',
+            style: {
+              width: '100px'
+            },
+            options: [
+              {
+                name: '启用',
+                value: 1,
+              },
+              {
+                name: '禁用',
+                value: 0,
+              },
+            ],
+          },
         ],
       },
-      // 分页配置
-      // paginationConfig: {
-      //   layout: 'total, prev, pager, next, sizes', // 分页组件显示哪些功能
-      //   pageSize: 10, // 每页条数
-      //   pageSizes: [5, 10, 20, 50],
-      //   style: { 'justify-content': 'flex-end' },
-      // },
       selectedItems: [],
-      dialogVisible: false,
-      dialogTitle: '',
       formData: {
         id: null,
         uuid: '',
@@ -200,8 +147,58 @@ export default defineComponent({
           },
         ],
       },
+      dialog: {
+        title: null,
+        tip: null,
+        type: null,
+        visible: false,
+        callConfirm: () => {
+          if (state.dialog.type === 'delete') {
+            state.confirmDelete(state.deleteScope)
+          } else if (state.dialog.type === 'batchDelete') {
+            state.confirmBatchDelete(state.selectedItems)
+          }
+        }
+      },
+      deleteScope: null,
+
+      handleCloseDialog() {
+        state.dialog.visible = false;
+      },
+      async confirmDelete(params) {
+        await delUser(params)
+        state.dialog.visible = false;
+        table.value.refresh()
+      },
+      async confirmBatchDelete(items) {
+        let ids_arr = []
+        items.forEach(item => {
+          ids_arr.push(item.id)
+        })
+        await batchDeleteUser({'ids': ids_arr})
+        state.dialog.visible = false;
+        table.value.refresh()
+      },
+      handleDelete(params) {
+        state.dialog.type = 'delete'
+        state.dialog.title = '删除用户'
+        state.dialog.tip = '确认要删除该用户吗?'
+        state.deleteScope = params
+        state.dialog.visible = true;  // 显示对话框
+      },
+
       batchDelete() {
-        console.log(state.selectedItems)
+        if (state.selectedItems.length === 0) {
+          ElMessage({
+            message: '请选择要删除的用户！',
+            type: "error",
+          });
+        } else {
+          state.dialog.type = 'batchDelete'
+          state.dialog.title = '批量删除用户'
+          state.dialog.tip = '确认要删除选中的用户吗?'
+          state.dialog.visible = true;  // 显示对话框
+        }
       },
       // 选择
       handleSelectionChange(arr) {
@@ -218,57 +215,18 @@ export default defineComponent({
           total: +data.data.page.total,
         }
       },
-      // 显示新增、编辑页面
-      showDialog(type, row) {
-        state.dialogVisible = true;
-        state.dialogTitle = type === '新增' ? '新增记录' : '编辑记录';
-        // 初始化表单数据
-        if (type === '编辑') {
-          // 获取编辑数据
-          state.fetchEditData(row)
-          state.isDisabled = true
-        } else {
-          state.formData = {} // 清空表单数据
-          state.isDisabled = false
-        }
-      },
-      // 关闭新增、编辑页面
-      handleCloseDialog() {
-        state.dialogVisible = false
-        // 可选：重置表单数据
-        state.formData = {};
-      },
-      // 接口获取选中数据
-      async fetchEditData(row) {
-        const params = {
-          uuid: row.uuid,
-        }
-        const { data } = await editUser(params)
-        state.formData.id = data.data.id
-        state.formData.uuid = data.data.uuid
-        state.formData.username = data.data.username
-        state.formData.nickname = data.data.nickname
-        state.formData.email = data.data.email
-        state.formData.login_type = data.data.login_type
-        state.formData.is_active = data.data.is_active
-      },
-      // 保存新增、编辑数据
-      submitForm() {
-        state.formRef.validate(async valid => {
-          if (valid) {
-            const { code, data, msg } = await saveUser(state.formData)
-            if (data.code === 1) {
-              state.handleCloseDialog()
-              refresh()
-            }
-          }
-        })
-      },
     })
     const table = ref(null)
     const refresh = () => {
       table.value.refresh()
     }
+
+    // 监听路由参数变化
+    watch(() => proxy.$route.params, (newParams) => {
+      if (JSON.stringify(newParams) === '{}') {
+        table.value.refreshAll()
+      }
+    });
 
     return { ...toRefs(state), refresh, table }
   },

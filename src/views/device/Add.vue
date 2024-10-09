@@ -16,7 +16,7 @@
         <el-form-item class="search-btn" style="width: 100%;">
           <el-button type="primary" icon="ArrowLeft" style="margin-left: auto;" @click="back">返回</el-button>
           <el-button type="primary" icon="Edit" style="margin-left: 20px;" @click="save">保存</el-button>
-          <el-button type="primary" icon="RefreshRight" style="margin-left: 20px;" @click="handleReset">重置</el-button>
+          <el-button type="primary" icon="Refresh" style="margin-left: 20px;" @click="handleReset">重置</el-button>
         </el-form-item>
       </div>
       <div class="form-row">
@@ -322,6 +322,22 @@
         </el-form-item>
       </div>
     </el-form>
+
+    <el-dialog
+      title="确认新增"
+      v-model="dialogVisible"
+      @close="handleCloseDialog"
+      width="500"
+    >
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirmSave()">
+            确 定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -380,6 +396,7 @@ export default defineComponent({
           value: 3,
         },
       ],
+      dialogVisible: false,
 
       // 返回（关闭）
       back() {
@@ -392,13 +409,9 @@ export default defineComponent({
       },
       // 保存
       save() {
-        console.log(state.formData)
         state.form.validate(async valid => {
           if (valid) {
-            const { data } = await saveDevice(state.formData)
-            if (data.code === 200) {
-              state.closeTag()
-            }
+            state.dialogVisible = true;  // 显示对话框
           }
         })
       },
@@ -408,7 +421,19 @@ export default defineComponent({
           return
         }
         state.formData={}
-      }
+      },
+
+      handleCloseDialog() {
+        state.dialogVisible = false;
+      },
+
+      async confirmSave() {
+        const { data } = await saveDevice(state.formData)
+        if (data.code === 200) {
+          state.handleCloseDialog()
+          state.closeTag()
+        }
+      },
     })
 
     const computedStatus = computed({
