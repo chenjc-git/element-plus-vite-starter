@@ -70,11 +70,10 @@
 </template>
 
 <script>
-import {defineComponent, reactive, ref, toRefs, onBeforeMount, watch} from 'vue'
-import {getDeviceList, del as deleteDevice, batchDel as batchDeleteDevice } from '~/api/network/device'
-import {ElMessage} from "element-plus";
-import {getCurrentInstance} from "vue-demi";
-import {batchDel as batchDelUser} from "~/api/network/user";
+import { defineComponent, reactive, ref, toRefs, onBeforeMount, watch } from 'vue'
+import { getDeviceList, del as deleteDevice, batchDel as batchDeleteDevice } from '~/api/network/device'
+import { ElMessage } from "element-plus";
+import { getCurrentInstance } from "vue-demi";
 export default defineComponent({
   name: 'Device',
   setup() {
@@ -152,29 +151,6 @@ export default defineComponent({
       },
       selectedItems: [],
       isDisabled: false,
-      statusSelect: {
-        label: '状态',
-        name: 'status',
-        defaultValue: 1,
-        options: [
-          {
-            name: '未知',
-            value: 0,
-          },
-          {
-            name: '正常',
-            value: 1,
-          },
-          {
-            name: '延迟',
-            value: 2,
-          },
-          {
-            name: '缺失',
-            value: 3,
-          },
-        ],
-      },
       dialog: {
         type: null,
         title: null,

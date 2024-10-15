@@ -54,6 +54,14 @@ export default {
             label: '编辑用户',
           }
         },
+        {
+          path: 'device_status/charts/:device_no',
+          name: 'cq20fee1-5ad7-51e1-2768-5e0933011b15',
+          component: '/src/views/device_status/Charts.vue',
+          meta:{
+            label: '设备状态图表',
+          }
+        },
       ]
     },
   ]

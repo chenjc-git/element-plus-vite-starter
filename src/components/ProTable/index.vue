@@ -15,6 +15,7 @@
         v-for="item in search.fields"
         :key="item.name"
         :label="item.label"
+        :label-width="item.width"
         :prop="item.name"
       >
         <slot v-if="item.type === 'custom'" :name="item.slot" />
@@ -364,7 +365,6 @@ export default defineComponent({
 
     // 请求列表数据
     const getTableData = async () => {
-      console.log("getTableData=================")
       state.loading = true
       const searchModel = optimizeFields(props.search)
       const { data, total } = await props.request({

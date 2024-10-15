@@ -87,7 +87,7 @@ export default {
         label:'系统管理',
       },
       children:[
-        {
+        /*{
           path: 'person',
           name: 'da20fee1-5ad7-51e1-2768-5e0933011f11',
           component: '/src/myComponents/风雷达组网/pages/用户管理.vue',
@@ -95,7 +95,7 @@ export default {
           meta:{
             label: '用户管理',
           }
-        },
+        },*/
         // {
         //   path: 'device',
         //   name: 'da20fee1-5ad7-51e1-2768-5e0933011a11',
@@ -121,6 +121,15 @@ export default {
           svg:'91e315392d3d11ef98d8b025aa2c9ada',
           meta:{
             label: '设备管理',
+          }
+        },
+        {
+          path: 'device_status',
+          name: 'da20fee1-5ad7-51e1-2768-5e0933011a14',
+          component: '/src/views/device_status/index.vue',
+          svg:'91e315392d3d11ef98d8b025aa2c9ada',
+          meta:{
+            label: '设备状态',
           }
         },
       ]
