@@ -454,11 +454,21 @@ export default defineComponent({
         state.editForm(newParams)  // 当路由参数变化时重新加载数据
       }
     });
-    state.isHidden = computed(() => {
-      if (state.formData.hide === 'true') {
-        return true
-      } else {
-        return false
+
+    state.isHidden = computed({
+      get() {
+        if (state.formData.hide === 'true') {
+          return true
+        } else {
+          return false
+        }
+      },
+      set(newValue) {
+        if (newValue === true) {
+          state.formData.hide = 'true'
+        } else {
+          state.formData.hide = 'false'
+        }
       }
     });
 
